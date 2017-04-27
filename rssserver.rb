@@ -1,5 +1,6 @@
 require 'cgi'
 require 'open-uri'
+require 'rss'
 
 def parse(page_source)
   dates = page_source.scan(
@@ -21,8 +22,3 @@ def format_text(title, url, url_title_time_ary)
   end
   s
 end
-
-puts format_text("sample crawler topics",
-                 "http://crawler.sbcr.jp.samplepage.html",
-                 parse(open("http://crawler.sbcr.jp/samplepage.html", "r:UTF-8", &:read))
-                )

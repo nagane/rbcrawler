@@ -22,3 +22,37 @@ def format_text(title, url, url_title_time_ary)
   end
   s
 end
+
+def format_rss(title, url, url_title_time_ary)
+
+  RSS::Maker.make("2.0") do |maker|
+    maker.channel.updated = Time.now.to_s
+    maker.channel.link = url
+    maker.channel.title = title
+    maker.channel.description = title
+
+    url_title_time_ary.each do |aurl, atitle, atime|
+      maker.items.new_item do |item|
+        item.link = aurl
+        item.title = atitle
+        item.updated = atime
+        item.description = atitle
+      end
+    end
+  end
+end
+
+parsed = parse(open(
+  "http://crawler.sbcr.jp/samplepage.html",
+  "r:UTF-8", &:read))
+
+formatter = case ARGV.first
+            when "rss-output"
+              :format_rss
+            when "text-output"
+              :format_text
+            end
+
+puts __send__(formatter,
+             "WWW.SBCR.JP トピックス",
+             "http://crawler.sbcr.jp/samplepage.html", parsed)

@@ -22,6 +22,29 @@ end
 
 class SbcrTopics < Site
   def parse
+    dates = page_source.scan(
+      %r!(\d+)年 ?(\d+)月 ?(\d+)日<br />!)
+    url_titles = page_source.scan(
+      %r!^<a href="(.+?)">(.+?)</a><br />!)
+    url_titles.zip(dates).map{|(aurl, atitle),
+      ymd|[GGI.unescapeHTML(aurl),
+      CGI.unescapeHTML(atitle), Time.local(*ymd)] 
+    }
+  end
+end
+
+class Formatter
+
+  def initialize(site)
+    @url = site.url
+    @title = site.title
+  end
+  attr_reader :url, :title
+
+end
+
+class TextFormatter < Formatter
+  def format(url_title_time_day)
 
   end
 end

@@ -27,8 +27,8 @@ class SbcrTopics < Site
     url_titles = page_source.scan(
       %r!^<a href="(.+?)">(.+?)</a><br />!)
     url_titles.zip(dates).map{|(aurl, atitle),
-      ymd|[GGI.unescapeHTML(aurl),
-      CGI.unescapeHTML(atitle), Time.local(*ymd)] 
+      ymd|[CGI.unescapeHTML(aurl),
+      CGI.unescapeHTML(atitle), Time.local(*ymd)]
     }
   end
 end
@@ -44,7 +44,7 @@ class Formatter
 end
 
 class TextFormatter < Formatter
-  def format(url_title_time_day)
+  def format(url_title_time_ary)
     s = "Title: #{title}\nURL: #{url}\n\n"
     url_title_time_ary.each do |aurl, atitle, atime|
       s << "* (#{atime})#{atitle}\n"

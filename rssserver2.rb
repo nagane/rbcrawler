@@ -1,6 +1,7 @@
 require 'cgi'
 require 'open-uri'
 require 'rss'
+require 'webrick'
 require 'kconv'
 
 class Site
@@ -72,6 +73,35 @@ class RSSFormatter < Formatter
       end
     end
   end
+end
+
+class RSSServlet <
+  WEBrick::HTTPServlet::AbstractServlet
+
+  def do_GET(req, res)
+    klass, opts = @options
+    res.body =
+      klass.new(opts).output(RSSFormatter).to_s
+    res.content_type =
+      "application/xml; charset=utf-8"
+  end
+end
+
+def start_server
+  srv = WEBrick::HTTPServer.new(:BindAddress => '127.0.0.1', :Port => 7777)
+
+  srv.mount('/rss.xml', RSSServlet , SbcrTopics,
+           url:"http://crawler.sbcr.jp/samplepage.html",
+           title:"ruby clrawler")
+
+  trap("INT"){srv.shutdown}
+  srv.start
+
+end
+
+
+if ARGV.first == "server"
+  start_server
 end
 
 

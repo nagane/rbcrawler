@@ -45,6 +45,43 @@ end
 
 class TextFormatter < Formatter
   def format(url_title_time_day)
-
+    s = "Title: #{title}\nURL: #{url}\n\n"
+    url_title_time_ary.each do |aurl, atitle, atime|
+      s << "* (#{atime})#{atitle}\n"
+      s << "     #{aurl}\n"
+    end
+    s
   end
+end
+
+class RSSFormatter < Formatter
+  def format(url_title_time_ary)
+    RSS::Maker.make("2.0") do |maker|
+      maker.channel.updated = Time.now.to_s
+      maker.channel.link = url
+      maker.channel.title = title
+      maker.channel.description = title
+
+      url_title_time_ary.each do |aurl, atitle, atime|
+        maker.items.new_item do |item|
+          item.link = aurl
+          item.title = atitle
+          item.updated = atime
+          item.description = atitle
+        end
+      end
+    end
+  end
+end
+
+
+site = SbcrTopics.new(
+  url:"http://crawler.sbcr.jp/samplepage.html",
+  title:"ruby clowler")
+
+case ARGV.first
+when "rss-output"
+  puts site.output RSSFormatter
+when "text-output"
+  puts site.output TextFormatter
 end
